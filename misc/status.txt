@@ -1,0 +1,3 @@
+Ben Hafner
+
+I've gotten VMWare set up on my personal MacBook Air and have Kali running on it. It's also nice to know that it's easy to use Kali on the computers in our classroom if I need to.
