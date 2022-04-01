@@ -1,0 +1,55 @@
+QUESTION 1
+
+ifconfig shows all network interfaces. On my MacBook Air, the one called en0 
+is wireless. Its IP address is listed as “inet 10.133.22.248”
+
+Source: https://superuser.com/questions/267660/can-someone-please-explain-ifconfig-output-in-mac-os-x
+
+QUESTION 2
+
+nslookup followed by the host’s domain name will tell you its IP address
+
+Source: https://www.computerhope.com/unix/unslooku.htm
+
+QUESTION 3
+
+nslookup also works in reverse. You can type nslookup followed by an IP 
+address and it will tell you the host name.
+
+Source: https://www.computerhope.com/unix/unslooku.htm
+
+QUESTION 4
+
+I was able to transfer the contents of a file called “test.txt” from my 
+virtual Kali desktop to a file called “output_file” on my normal desktop by 
+using the command “nc -l 1234 > output_file” on my normal computer and 
+“nc 10.133.22.248 1234 < test” on Kali.
+
+Source: https://www.tutorialspoint.com/unix_commands/nc.htm
+
+QUESTION 5
+
+nc -z www.google.com 80 (checks to see if google is listening to port 80)
+
+Source: https://www.tutorialspoint.com/unix_commands/nc.htm
+
+QUESTION 6
+
+nc -z -w 1 www.google.com 1-100 (This worked on the Kali terminal scan all 
+the ports from 1 to 100 waiting one second to try to connect to each, but it 
+didn't work on my normal terminal, and I don’t know why…)
+
+Source: https://www.tutorialspoint.com/unix_commands/nc.htm
+
+QUESTION 7
+
+curl www.google.com --output output_file_name 
+
+Source: http://www.compciv.org/recipes/cli/downloading-with-curl/
+
+QUESTIONS 8 AND 9
+
+curl -v www.google.com (shows extra information because of the -v flag, 
+including the headers sent by my computer and the headers sent back by the host)
+
+Source: your video “Brief Intro to HTTP”
