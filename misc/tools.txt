@@ -1,3 +1,5 @@
+Ben Hafner
+
 QUESTION 1
 
 ifconfig shows all network interfaces. On my MacBook Air, the one called en0 
