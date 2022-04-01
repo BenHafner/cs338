@@ -27,6 +27,9 @@ virtual Kali desktop to a file called “output_file” on my normal desktop by
 using the command “nc -l 1234 > output_file” on my normal computer and 
 “nc 10.133.22.248 1234 < test” on Kali.
 
+I think scp can also work to copy a file to a host without having to run a
+command on the host.
+
 Source: https://www.tutorialspoint.com/unix_commands/nc.htm
 
 QUESTION 5
