@@ -1,0 +1,93 @@
+Ben Hafner
+
+===== DAYTIME =====
+
+QUESTION 1
+
+The TCP 3-step handshake:
+
+Frame  Source IP       Destination IP  Protocol  Length  Info
+1      172.16.227.129  129.6.15.28     TCP       74      59284 -> 13 [SYN]
+2      129.6.15.28     172.16.227.129  TCP       60      13 -> 59284 [SYN, ACK]
+3      172.16.227.129  129.6.15.28     TCP       54      59284 -> 13 [ACK]
+
+QUESTION 2
+
+My nc client port for this interaction was 59284. The client port is important
+because there may be other software programs running on my computer that also
+want to use WiFi but my computer only has one IP address for WiFi. So each 
+software program gets its own port to do its own thing.
+
+QUESTION 3
+
+Frame  Source IP       Destination IP  Protocol  Length  Info
+4      129.6.15.28     172.16.227.129  DAYTIME   105     current date and time
+
+QUESTION 4
+
+59673 22-04-04 03:26:13 50 0 0 237.2 UTC(NIST) *
+
+Here's what all that means:
+
+59673     "Modified Julian Day"
+22-04-04  date
+03:26:13  time
+50        means we are in daylight savings time
+0         means there is no leap second coming up
+0         means the server is "healthy"
+237.2     server's attempt to compensate for internet travel time (milliseconds)
+UTC(NIST) time zone
+*         for compatibility with the ACTS format
+
+Source: https://tf.nist.gov/general/pdf/1046.pdf
+
+QUESTION 5
+
+A [SYN] packet says what sequence number the current packet is so that the 
+two programs can synch up.
+
+QUESTION 6
+
+[ACK] is just an acknowledgment like "roger that."
+
+QUESTION 7
+
+[FIN] is the packet you send to terminate the connection.
+
+QUESTION 8
+
+Here's what happened at the end of my connection to the server:
+
+Frame  Source IP       Destination IP  Protocol  Length  Info
+5      172.16.227.129  129.6.15.28     TCP       54      59284 -> 13 [FIN, ACK]
+6      129.6.15.28     172.16.227.129  TCP       60      13 -> 59284 [ACK]
+
+In frame 5, my nc client acknowledged the DAYTIME packet and asked to terminate
+the connection. In frame 6, the NIST server acknowledged my packet and then
+stopped talking.
+
+===== HTTP =====
+
+QUESTION 1
+
+It looks like Firefox opened two TCP connections, one from port 38738 and one
+from port 38740.
+
+QUESTION 2
+
+Frame  Source IP       Destination IP  Protocol  Length  Info
+7      172.16.227.129  45.79.89.123    HTTP      395     GET /index.html HTTP/1.1
+
+QUESTION 3
+
+Frame  Source IP       Destination IP  Protocol  Length  Info
+11     172.16.227.129  45.79.89.123    HTTP      364     GET /jeff_square_head.jpg HTTP/1.1
+
+===== QUESTIONS =====
+
+What are the [PSH] packets?
+
+Why did Firefox request favicon.ico and is that why there was a 404 Not Found
+error?
+
+Wireshark color codes the frames/packets, but I don't know what the colors mean.
