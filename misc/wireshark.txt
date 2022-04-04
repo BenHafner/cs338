@@ -43,12 +43,13 @@ Source: https://tf.nist.gov/general/pdf/1046.pdf
 
 QUESTION 5
 
-A [SYN] packet says what sequence number the current packet is so that the 
-two programs can synch up.
+[SYN] means "here's my port number, can we talk?"
 
 QUESTION 6
 
-[ACK] is just an acknowledgment like "roger that."
+[ACK] is just an acknowledgment like "roger that." Once the [SYN] and [ACK] 
+packets have been sent back and forth, the sequence numbers should be
+properly synched. 
 
 QUESTION 7
 
