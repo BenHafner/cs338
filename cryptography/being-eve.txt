@@ -1,0 +1,46 @@
+Ben Hafner
+
+===== DIFFIE HELLMAN =====
+
+Here's what Eve knows:
+
+11^a mod 59 = 57
+11^b mod 59 = 44
+
+Computing a and b from this information is a discrete log problem. Apparently no one knows how to solve this problem quickly for large numbers, but these numbers are pretty small so you can just brute force it. I wrote a simple Python program that prints out 11^i mod 59 for i ranging from 0 to 58. Then I looked through the table it generated and to find 57 and 44. I found that
+
+11^36 mod 59 = 57
+11^15 mod 59 = 44
+
+so a = 36 and b = 15. The shared secret can be found using either a or b, so Eve really only needs to compute of them.
+
+44^a mod 59 = 36
+57^b mod 59 = 36
+
+Either way, you get 36 as the shared secret. But this strategy for Eve requires solving the discrete log problem, which is supposed to be very hard for large numbers, like I said before.
+
+===== RSA =====
+
+To break this encryption, I need to solve the equation
+
+m^13 mod 5561 = c
+
+for m, where m is a block of Alice's original plaintext message and c is the corresponding block of cyphertext sent to Bob. This is called "the RSA problem." You can do it by brute force by trying every possible m, but you'd have to do that for every single block. Another option is to figure out Bob's private key by factoring 5561, which is what I'm going to try.
+
+First, I found a website that factors integers. I plugged in 5561 and found that it is equal to 67 times 83 (this is the important step that would be much harder if the numbers were bigger). The point of factoring 5561 is that now there's a special trick for computing Euler's totient function of 5561, which is the number of positive integers less than 5561 that are relatively prime to 5561. The trick is to just multiply p - 1 and q - 1.
+
+(67 - 1) * (83 - 1) = 5412
+
+You can also use Carmichael's totient function instead if you want, in which case you'd take the least common multiple of p - 1 and q - 1 instead of their product. Anyway, the final step is to compute the multiplicative inverse of 13 mod 5412, which I did using the function pow(13, -1, 5412) in Python. The result is 1249, Bob's private key! Now I can decrypt m from c using
+
+m = c^1249 mod 5561
+
+or, in Python, 
+
+m = pow(c, 1249, 5561)
+
+Doing this gave me a bunch of numbers between 0 and 127, which I figured were the encoded ASCII characters of the plaintext. Decoding resulted in this message:
+
+Hey Bob. It's even worse than we thought! Your pal, Alice. https://www.schneier.com/blog/archives/2022/04/airtags-are-used-for-stalking-far-more-than-previously-reported.html
+
+But there is a problem with this simple encoding scheme. Even if Bob were using really big numbers (like 4096 bits long) for encryption, there are only 128 different ASCII characters. Eve could use Bob's public key to individually encrypt all 128 ASCII characters and then she'd know which cypher text blocks correspond to which ASCII characters.
