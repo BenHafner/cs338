@@ -224,5 +224,3 @@ checked that "exponent1" and "exponent2" were really d mod (p-1) and d mod
 1, confirming that it really is the inverse of q mod p. So everything checks 
 out! The way I checked all this was using Python, since Python lets you make 
 integers really big.
-
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
