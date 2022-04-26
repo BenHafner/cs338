@@ -1,0 +1,113 @@
+Ben Hafner
+
+===== QUESTION 1 =====
+
+Since PITM is impossible, Alice and Bob can use the Diffie-Hellman key exchange 
+procedure to agree on a shared secret, K, and be confident that they are the 
+only two people who know K. In order for Eve to figure out K, she would need to 
+solve the discrete log problem, which is very very hard. Then Alice can encrypt 
+her long message M with C = AES(K, M) and send C to Bob, who can decrypt it 
+using AES_D(K, C) = M.
+
+===== QUESTION 2 =====
+
+In this case, confidentiality is not important so Alice can send Bob the message 
+M in cleartext. At the end of the message, Alice adds a signature, which she 
+computes like this: Sig = E(S_A, H(M)). When Bob receives M and Sig, he uses 
+Alice's public key P_A to check if H(M) == E(P_A, Sig).
+
+If Mal had modified the message without changing the signature, this check would 
+fail, alerting Bob. Mal can't can't create a new signature for the modified 
+message because Mal doesn't have Alice's secret key S_A.
+
+===== QUESTION 3 =====
+
+I think the easiest way to solve this problem is to combine the solutions from 
+questions 1 and 2. First Alice and Bob use Diffie-Hellman to agree on a shared 
+secret K. Then Alice adds a signature Sig = E(S_A, H(C)) to the end of the 
+contract C. Finally, Alice encrypts the signed contract using X = AES(K, C || 
+Sig) and sends X to Bob. Bob decrypts using AES_D(K, X) to get C || Sig and then 
+checks if H(C) == E(P_A, Sig).
+
+Eve can't read the contract C because it was encrypted with AES using with K, 
+which only Alice and Bob know. Furthermore, if someone else other than Alice 
+pretends to be Alice and sends Bob a different contract C', they won't be able 
+to compute Sig = E(S_A, H(C')) because they don't have S_A. Therefore, they 
+won't be able to convince Bob that they are Alice.
+
+===== QUESTION 4 =====
+
+1. Alice: "Bob made up this contract C that says I owe him a million dollars. He 
+forged my signature Sig. I didn't have anything to do with it and I kept my 
+secret key safe."
+
+As the judge, I would first check if H(C) == E(P_A, Sig). If this is true, then 
+it is very unlikely that Bob made up C and forged Sig without knowing Alice's 
+secret key S_A. Finding the value of Sig that satisfies H(C) == E(P_A, Sig) for 
+a given C is equivalent to breaking the asymmetric encryption to figure out 
+plaintext from cyphertext, which is very hard. Bob could also try making up Sig 
+first and then looking for a C that matches it, but this strategy would require 
+computing C from H(C), which is also very hard.
+
+2. Alice: "Whoops, I lost my secret key. Bob made up C and used my secret key to 
+sign it."
+
+This seems pretty reasonable.
+
+3. Alice: "What?! P_A isn't my public key at all! Bob made up P_A and the 
+corresponding S_A and then used S_A to sign a fake contract."
+
+I might or might not believe this argument, depending on if Bob can somehow 
+prove that P_A really is Alice's public key. For example, is there a signed 
+certificate from a trustworthy CA that binds P_A to Alice's identity? If not, 
+then anyone could have made up a public key and claimed it belonged to Alice.
+
+===== QUESTION 5 =====
+
+Sig_CA = E(S_CA, H("bob.com" || P_B))
+
+===== QUESTION 6 =====
+
+Cert_B proves that P_B is definitely Bob's public key (as long as the CA is 
+trustworthy), but since Cert_B is public knowledge, anyone can send Alice Cert_B 
+and claim to be Bob. To check if it's really Bob who sent her Cert_B, Alice can 
+send Bob a random number R and ask him to send back X = E(S_B, R). Only Bob can 
+do this, since it requires S_B. Then Alice can use Bob's public key to make sure 
+E(P_B, X) == R.
+
+One problem with this protocol is that Alice can ask Bob to compute E(S_B, R) 
+for any R of her choice. This means she can decrypt any ciphertext C that was 
+encrypted using Bob's public key by just sending Bob C and asking for E(S_B, C). 
+This could be a big vulnerability. I think one way of fixing the problem might 
+be for Bob to send back X = E(S_B, H(R)) instead of X = E(S_B, R) after Alice 
+sends R. Then Alice would check that E(P_B, X) == H(R). This way, if Alice wants 
+to decrypt some ciphertext C, she would first have to find an R such that H(R) 
+== C, which is very difficult to do. Another solution, if Alice and Bob have 
+already established a shared secret K with a Diffie-Hellman exchange, would be 
+for Bob to send Alice X = E(S_B, H(R || K)) or something like that. I think this 
+would also help prevent PITM attacks.
+
+===== QUESTION 7 =====
+
+1. Suppose Mal is able to create two different "to be signed" certificates that 
+have the same hash value (this is called a collision I think):
+         
+     TBS_1 = "mal.com" || P_1
+     TBS_2 = "bob.com" || P_2
+     H(TBS_1) = H(TBS_2)
+
+Then Mal could ask a CA to sign TBS_1, and attach that signature to TBS_2. The 
+signature for TBS_1 will also work for TBS_2. Using this strategy, Mal can put 
+together a forged certificate and pretend to be Bob. Alice will think P_1 is 
+Bob's public key, when in reality Mal created P_1 and the corresponding S_1
+
+2. What if Mal just tells Alice "I'm bob.com, here's Cert_B" and gives Alice 
+Bob's signed certificate but modifies Cert_B to have Mal's public key instead of 
+Bob's. This is a blatantly forged certificate, so when Alice's browser checks 
+the signature, it will be rejected. Alice's browser will display a warning 
+message like "Warning, this website is not safe!" But Alice will probably just 
+click the button that says "continue to bob.com anyway" instead of the button 
+that says "return to safety" because she doesn't have the time or energy to 
+think about potential cyber attacks. She just wants to visit bob.com.
+
+3. Mal could ask a friend who works at a CA for a forged certificate.
