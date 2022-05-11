@@ -1,0 +1,67 @@
+Ben Hafner
+CS 338 Computer Security
+May 2022
+Password Cracking Assignment
+
+Sorry there are so many files in this folder. I included all the original passwords files and the words list and three different python files, one for each part.
+
+=====Part 1=====
+Total time: 0.589 seconds
+Number of hashes computed: 267751 
+Passwords cracked: 2805
+Time per hash computed: 2.2 microseconds
+Time per password cracked: 0.21 milliseconds
+Passwords cracked per number of hashes computed: 0.010
+
+=====Part 2=====
+Total time: 35.1 hours
+Number of hashes computed: 16800612341
+Passwords cracked: 2805
+Time per hash computed: 1.8 microseconds
+Time per password cracked: 45 seconds
+Passwords cracked per number of hashes computed: 0.000000039
+
+=====Part 3=====
+Total time: 10.7 minutes
+Number of hashes computed: 373448547
+Passwords cracked: 2805
+Time per hash computed: 1.7 microseconds
+Time per password cracked: 0.23 seconds
+Passwords cracked per number of hashes computed: 0.0000075
+
+=====Analysis=====
+-- Did your time per hash computed change between phases? By what factor? Why?
+
+My time per hash was pretty much the same in every part. It was a little longer in Part 1 because the passwords were being cracked so fast that a significant portion of the run time was just printing them out.
+ 
+-- Did your time per password crack change between phases? By what factor? Why?
+
+In Part 1, I iterated through the list of words, computing the hash digest of each word and then checking if it was one of the password hash digests with a dictionary look up, which is O(1). So since I cracked all the passwords by just iterating through the words once, my time per password crack was on the order of (# of passwords)/(# of words). Btw, (# of words) = 267751 and (# of passwords) = 2805.
+
+In Part 2, I used the same strategy, but the number of possible passwords increased from (# of words) to (# of words)^2, which is a BIG change. That meant my time per password crack went way down to (# of passwords)/(# of words)^2. It had to run for over a day to get all the passwords!
+
+In Part 3, I had to switch my strategy because of the salt. There are too many salt values to compute the hash of every possible password with every possible salt. So, instead, I went one password at a time. For each password, I computed the hash of every singe word concatenated with that password's salt until I got the desired hash value. That meant my time per password crack was on the order of 1/(# of words), which is over 1000 times slower than Part 1 but over 100 times faster than Part 2.
+
+-- Suppose you wanted to precompute all the possible password hashes for each
+so you could just look up the password in a table indexed by the hash. How much
+memory would be required for each phase?
+
+Assume each word-hash pair takes about 100 bytes of memory to store.
+For Part 1, it'd be pretty easy. You'd need 27 megabytes.
+For Part 2, it'd be much harder. You'd need 7 terabytes.
+For Part 3... nearly impossible. You'd need 115 petabytes.
+
+-- Give 3-4 reasons we should store password hashes and not the passwords themselves.
+Think in terms of threats, who the attackers might be, etc.
+
+1. If passwords were stored as plaintext, an employee with access to the passwords database could log into anyone's account if they wanted to.
+
+2. If passwords were stored as plaintext, a hacker who gains access to the passwords database could immediately log into every account.
+
+3. Suppose the web server and the password database are in different locations, and someone figures out how to read the communications between them. If passwords were stored in plaintext, these communications would look like:
+     Web server: "Is 'moose' the password for the account 'jondich'?"
+     Password database: "Yes it is!"
+But if the passwords were stored as hashes, it would be:
+     Web server: "Is '182072537ada59e...' the hash for the account 'jondich'?"
+     Password database: "Yes it is!"
+So even if someone could read (and decrypt if encrypted) the communications between the web server and the password database, they wouldn't see anyone's passwords.
